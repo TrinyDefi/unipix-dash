@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import * as Phaser from "phaser";
 import { buildTextures } from "./textures";
 
 const W = 480;

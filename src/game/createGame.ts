@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import * as Phaser from "phaser";
 import { PlayScene } from "./PlayScene";
 
 export function createGame(parent: HTMLElement, skin: string) {
