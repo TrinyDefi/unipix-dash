@@ -259,7 +259,14 @@ export class PlayScene extends Phaser.Scene {
     };
     this.obstacles.children.iterate((c) => { move(c); return true; });
     this.orbs.children.iterate((c) => { move(c); return true; });
-    this.powerups.children.iterate((c) => { move(c); return true; });
+    this.powerups.children.iterate((c) => {
+      move(c);
+      const p = c as Obstacle;
+      if (p.active && (p as any)._baseY != null) {
+        p.y = (p as any)._baseY + Math.sin(this.time.now / 250 + (p as any)._bobPhase) * 6;
+      }
+      return true;
+    });
 
     // Magnet effect: pull orbs toward unicorn
     if (this.time.now < this.magnetUntil) {
