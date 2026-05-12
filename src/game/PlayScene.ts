@@ -4,10 +4,10 @@ import { buildTextures } from "./textures";
 const W = 480;
 const H = 270;
 const GROUND_Y = 230;
-const GRAVITY = 1400;
-const JUMP_VEL = -460;
-const BASE_SPEED = 160;
-const MAX_SPEED = 380;
+const GRAVITY = 1500;
+const JUMP_VEL = -520;
+const BASE_SPEED = 150;
+const MAX_SPEED = 340;
 
 type Obstacle = Phaser.Physics.Arcade.Sprite & { _kind?: string };
 
@@ -310,41 +310,47 @@ export class PlayScene extends Phaser.Scene {
 
   private spawnObstacle() {
     const kinds = ["crate", "glitch", "beam"];
-    // After distance >800, allow tall stacks
     const kind = Phaser.Utils.Array.GetRandom(kinds);
     const x = W + 40;
     let s = this.obstacles.get(x, 0, kind) as Obstacle | null;
     if (!s) return;
     s._kind = kind;
-    s.setActive(true).setVisible(true).setTexture(kind);
+    s.setTexture(kind);
+    s.setOrigin(0.5, 1);
     if (kind === "crate") {
-      s.setSize(20, 20).setOffset(2, 2);
       s.setPosition(x, GROUND_Y - 12);
-      s.setOrigin(0.5, 1);
-      // sometimes stack 2
+      this.activatePoolSprite(s, 20, 20, 2, 2);
       if (Math.random() < 0.25 && this.distance > 400) {
         const top = this.obstacles.get(x, 0, "crate") as Obstacle | null;
         if (top) {
           top._kind = "crate";
-          top.setActive(true).setVisible(true).setTexture("crate");
-          top.setSize(20, 20).setOffset(2, 2);
+          top.setTexture("crate");
           top.setOrigin(0.5, 1);
           top.setPosition(x, GROUND_Y - 36);
-          top.body && (top.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+          this.activatePoolSprite(top, 20, 20, 2, 2);
         }
       }
     } else if (kind === "glitch") {
-      s.setSize(16, 16).setOffset(2, 2);
       s.setPosition(x, GROUND_Y - 12);
-      s.setOrigin(0.5, 1);
-      // tween glitch effect
       s.setAlpha(1);
+      this.activatePoolSprite(s, 16, 16, 2, 2);
     } else if (kind === "beam") {
-      s.setSize(36, 8).setOffset(2, 1);
-      s.setPosition(x, GROUND_Y - 40);
       s.setOrigin(0.5, 0.5);
+      s.setPosition(x, GROUND_Y - 40);
+      this.activatePoolSprite(s, 36, 8, 2, 1);
     }
-    if (s.body) (s.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+  }
+
+  private activatePoolSprite(s: Obstacle, w: number, h: number, ox: number, oy: number) {
+    s.setActive(true).setVisible(true);
+    const body = s.body as Phaser.Physics.Arcade.Body | null;
+    if (body) {
+      body.enable = true;
+      body.setAllowGravity(false);
+      body.setSize(w, h);
+      body.setOffset(ox, oy);
+      body.reset(s.x, s.y);
+    }
   }
 
   private spawnOrbCluster() {
@@ -352,14 +358,13 @@ export class PlayScene extends Phaser.Scene {
     const baseY = Phaser.Math.Between(GROUND_Y - 80, GROUND_Y - 30);
     const startX = W + 20;
     for (let i = 0; i < count; i++) {
-      const o = this.orbs.get(startX + i * 16, baseY, "orb") as Obstacle | null;
+      const y = baseY + Math.sin(i * 0.7) * 6;
+      const o = this.orbs.get(startX + i * 16, y, "orb") as Obstacle | null;
       if (!o) continue;
-      o.setActive(true).setVisible(true).setTexture("orb");
-      o.setSize(10, 10).setOffset(1, 1);
-      if (o.body) (o.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+      o.setTexture("orb");
       o.setOrigin(0.5);
-      // gentle bobbing
-      o.y = baseY + Math.sin(i * 0.7) * 6;
+      o.setPosition(startX + i * 16, y);
+      this.activatePoolSprite(o, 10, 10, 1, 1);
     }
   }
 
@@ -369,10 +374,10 @@ export class PlayScene extends Phaser.Scene {
     const p = this.powerups.get(W + 20, GROUND_Y - 60, kind) as Obstacle | null;
     if (!p) return;
     p._kind = kind;
-    p.setActive(true).setVisible(true).setTexture(kind);
-    p.setSize(14, 14).setOffset(1, 1);
+    p.setTexture(kind);
     p.setOrigin(0.5);
-    if (p.body) (p.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+    p.setPosition(W + 20, GROUND_Y - 60);
+    this.activatePoolSprite(p, 14, 14, 1, 1);
     (p as any)._baseY = p.y;
     (p as any)._bobPhase = Math.random() * Math.PI * 2;
   }
