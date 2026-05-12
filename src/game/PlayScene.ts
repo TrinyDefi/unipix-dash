@@ -358,14 +358,13 @@ export class PlayScene extends Phaser.Scene {
     const baseY = Phaser.Math.Between(GROUND_Y - 80, GROUND_Y - 30);
     const startX = W + 20;
     for (let i = 0; i < count; i++) {
-      const o = this.orbs.get(startX + i * 16, baseY, "orb") as Obstacle | null;
+      const y = baseY + Math.sin(i * 0.7) * 6;
+      const o = this.orbs.get(startX + i * 16, y, "orb") as Obstacle | null;
       if (!o) continue;
-      o.setActive(true).setVisible(true).setTexture("orb");
-      o.setSize(10, 10).setOffset(1, 1);
-      if (o.body) (o.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+      o.setTexture("orb");
       o.setOrigin(0.5);
-      // gentle bobbing
-      o.y = baseY + Math.sin(i * 0.7) * 6;
+      o.setPosition(startX + i * 16, y);
+      this.activatePoolSprite(o, 10, 10, 1, 1);
     }
   }
 
@@ -375,10 +374,10 @@ export class PlayScene extends Phaser.Scene {
     const p = this.powerups.get(W + 20, GROUND_Y - 60, kind) as Obstacle | null;
     if (!p) return;
     p._kind = kind;
-    p.setActive(true).setVisible(true).setTexture(kind);
-    p.setSize(14, 14).setOffset(1, 1);
+    p.setTexture(kind);
     p.setOrigin(0.5);
-    if (p.body) (p.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+    p.setPosition(W + 20, GROUND_Y - 60);
+    this.activatePoolSprite(p, 14, 14, 1, 1);
     (p as any)._baseY = p.y;
     (p as any)._bobPhase = Math.random() * Math.PI * 2;
   }
