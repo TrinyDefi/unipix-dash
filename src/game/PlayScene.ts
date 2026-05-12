@@ -4,10 +4,10 @@ import { buildTextures } from "./textures";
 const W = 480;
 const H = 270;
 const GROUND_Y = 230;
-const GRAVITY = 1400;
-const JUMP_VEL = -460;
-const BASE_SPEED = 160;
-const MAX_SPEED = 380;
+const GRAVITY = 1500;
+const JUMP_VEL = -520;
+const BASE_SPEED = 150;
+const MAX_SPEED = 340;
 
 type Obstacle = Phaser.Physics.Arcade.Sprite & { _kind?: string };
 
