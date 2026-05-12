@@ -310,41 +310,47 @@ export class PlayScene extends Phaser.Scene {
 
   private spawnObstacle() {
     const kinds = ["crate", "glitch", "beam"];
-    // After distance >800, allow tall stacks
     const kind = Phaser.Utils.Array.GetRandom(kinds);
     const x = W + 40;
     let s = this.obstacles.get(x, 0, kind) as Obstacle | null;
     if (!s) return;
     s._kind = kind;
-    s.setActive(true).setVisible(true).setTexture(kind);
+    s.setTexture(kind);
+    s.setOrigin(0.5, 1);
     if (kind === "crate") {
-      s.setSize(20, 20).setOffset(2, 2);
       s.setPosition(x, GROUND_Y - 12);
-      s.setOrigin(0.5, 1);
-      // sometimes stack 2
+      this.activatePoolSprite(s, 20, 20, 2, 2);
       if (Math.random() < 0.25 && this.distance > 400) {
         const top = this.obstacles.get(x, 0, "crate") as Obstacle | null;
         if (top) {
           top._kind = "crate";
-          top.setActive(true).setVisible(true).setTexture("crate");
-          top.setSize(20, 20).setOffset(2, 2);
+          top.setTexture("crate");
           top.setOrigin(0.5, 1);
           top.setPosition(x, GROUND_Y - 36);
-          top.body && (top.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+          this.activatePoolSprite(top, 20, 20, 2, 2);
         }
       }
     } else if (kind === "glitch") {
-      s.setSize(16, 16).setOffset(2, 2);
       s.setPosition(x, GROUND_Y - 12);
-      s.setOrigin(0.5, 1);
-      // tween glitch effect
       s.setAlpha(1);
+      this.activatePoolSprite(s, 16, 16, 2, 2);
     } else if (kind === "beam") {
-      s.setSize(36, 8).setOffset(2, 1);
-      s.setPosition(x, GROUND_Y - 40);
       s.setOrigin(0.5, 0.5);
+      s.setPosition(x, GROUND_Y - 40);
+      this.activatePoolSprite(s, 36, 8, 2, 1);
     }
-    if (s.body) (s.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+  }
+
+  private activatePoolSprite(s: Obstacle, w: number, h: number, ox: number, oy: number) {
+    s.setActive(true).setVisible(true);
+    const body = s.body as Phaser.Physics.Arcade.Body | null;
+    if (body) {
+      body.enable = true;
+      body.setAllowGravity(false);
+      body.setSize(w, h);
+      body.setOffset(ox, oy);
+      body.reset(s.x, s.y);
+    }
   }
 
   private spawnOrbCluster() {
