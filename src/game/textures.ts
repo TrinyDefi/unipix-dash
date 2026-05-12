@@ -1,5 +1,5 @@
 // Procedural pixel-art texture generation. Keeps bundle tiny and avoids asset loading.
-import Phaser from "phaser";
+import * as Phaser from "phaser";
 
 type Px = string | null;
 
