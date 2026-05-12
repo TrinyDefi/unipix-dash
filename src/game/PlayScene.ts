@@ -331,7 +331,7 @@ export class PlayScene extends Phaser.Scene {
       s.setPosition(x, GROUND_Y - 12);
       s.setOrigin(0.5, 1);
       // tween glitch effect
-      this.tweens.add({ targets: s, alpha: { from: 0.6, to: 1 }, duration: 120, yoyo: true, repeat: -1 });
+      s.setAlpha(1);
     } else if (kind === "beam") {
       s.setSize(36, 8).setOffset(2, 1);
       s.setPosition(x, GROUND_Y - 40);
@@ -366,7 +366,8 @@ export class PlayScene extends Phaser.Scene {
     p.setSize(14, 14).setOffset(1, 1);
     p.setOrigin(0.5);
     if (p.body) (p.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
-    this.tweens.add({ targets: p, y: p.y - 6, duration: 600, yoyo: true, repeat: -1, ease: "sine.inOut" });
+    (p as any)._baseY = p.y;
+    (p as any)._bobPhase = Math.random() * Math.PI * 2;
   }
 
   private collectOrb(o: Obstacle) {
