@@ -72,6 +72,7 @@ export class PlayScene extends Phaser.Scene {
     this.magnetUntil = 0;
     this.multUntil = 0;
     this.doubleJumpUntil = 0;
+    this.lastMilestone = 0;
     try {
       this.bestScore = parseInt(localStorage.getItem("unipix_best") ?? "0", 10) || 0;
     } catch {
