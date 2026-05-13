@@ -68,6 +68,13 @@
   * {
     border-color: var(--color-border);
   }
+  html, body {
+    overscroll-behavior: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+  }
   body {
     background: radial-gradient(ellipse at top, oklch(0.2 0.1 310) 0%, oklch(0.08 0.04 290) 70%);
     color: var(--color-foreground);
@@ -135,5 +142,30 @@
     );
     pointer-events: none;
     mix-blend-mode: multiply;
+  }
+  .touch-jump-btn {
+    width: 88px;
+    height: 88px;
+    border-radius: 50%;
+    border: 3px solid #000;
+    background: radial-gradient(circle at 30% 30%, #ff66c4, #ff1493 60%, #c70080);
+    color: #fff;
+    font-family: var(--font-pixel);
+    font-size: 22px;
+    line-height: 1;
+    text-align: center;
+    text-shadow: 1px 1px 0 #000;
+    box-shadow:
+      inset 0 -4px 0 rgba(0,0,0,0.4),
+      inset 0 4px 0 rgba(255,255,255,0.25),
+      0 0 24px rgba(255,20,147,0.7);
+    touch-action: none;
+    cursor: pointer;
+    transition: transform 0.05s ease;
+  }
+  .touch-jump-btn:active { transform: scale(0.94); }
+  /* Hide the on-screen jump button on devices without touch (desktop) */
+  @media (hover: hover) and (pointer: fine) {
+    .touch-jump-btn { display: none; }
   }
 }
