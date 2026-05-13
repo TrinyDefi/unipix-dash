@@ -1,5 +1,6 @@
 import * as Phaser from "phaser";
 import { buildTextures } from "./textures";
+import { audio } from "./audio";
 
 const W = 480;
 const H = 270;
@@ -71,6 +72,7 @@ export class PlayScene extends Phaser.Scene {
     this.magnetUntil = 0;
     this.multUntil = 0;
     this.doubleJumpUntil = 0;
+    this.lastMilestone = 0;
     try {
       this.bestScore = parseInt(localStorage.getItem("unipix_best") ?? "0", 10) || 0;
     } catch {
@@ -227,7 +229,10 @@ export class PlayScene extends Phaser.Scene {
     this.jumpsLeft--;
     this.unicorn.play("jump");
     this.particles.emitParticleAt(this.unicorn.x, this.unicorn.y, 6);
+    audio.jump();
   }
+
+  private lastMilestone = 0;
 
   update(_time: number, delta: number) {
     if (!this.alive) return;
@@ -389,6 +394,7 @@ export class PlayScene extends Phaser.Scene {
     this.score += 10 * mult;
     this.particles.setTexture("spark_pink");
     this.particles.emitParticleAt(o.x, o.y, 5);
+    audio.coin();
   }
 
   private collectPowerup(p: Obstacle) {
@@ -406,6 +412,7 @@ export class PlayScene extends Phaser.Scene {
     } else if (kind === "pu_mult") {
       this.multUntil = this.time.now + 7000;
     }
+    audio.power();
     this.flashRect.setFillStyle(0x00e5ff, 0.35);
     this.tweens.add({ targets: this.flashRect, alpha: 0, duration: 300 });
   }
@@ -413,15 +420,16 @@ export class PlayScene extends Phaser.Scene {
   private hitObstacle(o: Obstacle) {
     if (!o.active || !this.alive) return;
     if (this.time.now < this.shieldUntil) {
-      // Consume shield, destroy obstacle
       this.shieldUntil = 0;
       o.disableBody(true, true);
       this.particles.setTexture("spark_cyan");
       this.particles.emitParticleAt(o.x, o.y, 16);
       this.flashRect.setFillStyle(0x00e5ff, 0.5);
       this.tweens.add({ targets: this.flashRect, alpha: 0, duration: 250 });
+      audio.power();
       return;
     }
+    audio.hit();
     this.gameOver();
   }
 
@@ -436,6 +444,11 @@ export class PlayScene extends Phaser.Scene {
     this.hudText.setText(
       `SCORE ${score}   DIST ${dist}m\nBEST  ${best}${buffs.length ? "  " + buffs.join(" ") : ""}`
     );
+    const ms = Math.floor(score / 250);
+    if (ms > this.lastMilestone) {
+      this.lastMilestone = ms;
+      audio.milestone();
+    }
   }
 
   private gameOver() {
@@ -453,6 +466,7 @@ export class PlayScene extends Phaser.Scene {
     try {
       localStorage.setItem("unipix_best", String(best));
     } catch {}
+    audio.gameover();
 
     this.time.delayedCall(700, () => {
       this.game.events.emit("gameover", { score: finalScore, distance: finalDist, best } as GameOverPayload);
