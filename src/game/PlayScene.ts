@@ -1,5 +1,6 @@
 import * as Phaser from "phaser";
 import { buildTextures } from "./textures";
+import { audio } from "./audio";
 
 const W = 480;
 const H = 270;
@@ -227,7 +228,10 @@ export class PlayScene extends Phaser.Scene {
     this.jumpsLeft--;
     this.unicorn.play("jump");
     this.particles.emitParticleAt(this.unicorn.x, this.unicorn.y, 6);
+    audio.jump();
   }
+
+  private lastMilestone = 0;
 
   update(_time: number, delta: number) {
     if (!this.alive) return;
@@ -389,6 +393,7 @@ export class PlayScene extends Phaser.Scene {
     this.score += 10 * mult;
     this.particles.setTexture("spark_pink");
     this.particles.emitParticleAt(o.x, o.y, 5);
+    audio.coin();
   }
 
   private collectPowerup(p: Obstacle) {
